@@ -123,9 +123,15 @@ function replaceTemplates(input: string): string {
     if (name === "quote" || name === "cquote") {
       return parts[1] ? ` ${parts[1].trim()} ` : "";
     }
-    const positional = parts.slice(1).map((part) => part.trim()).filter((part) => part && !part.includes("="));
-    if (/^[A-Z]/.test(rawName) && positional.length) return ` ${positional[positional.length - 1]} `;
-    if (/^[A-Z]/.test(rawName) && rawName.length < 60) return ` ${rawName} `;
+    if (name === "wp" || name === "w") {
+      const positional = parts.slice(1).map((part) => part.trim()).filter((part) => part && !part.includes("="));
+      return positional.length ? ` ${positional[positional.length - 1]} ` : "";
+    }
+    // Titled link templates such as {{Red Dead|Red Dead Universes|Redemption Universe}}.
+    if (/^[A-Z][\w.' ]+$/.test(rawName) && rawName.includes(" ") && !/^(infobox|navbox|about|for|cite|multiple image)\b/i.test(rawName)) {
+      const positional = parts.slice(1).map((part) => part.trim()).filter((part) => part && !part.includes("="));
+      return ` ${positional.at(-1) || rawName} `;
+    }
     return "";
   });
 }
@@ -151,6 +157,7 @@ export function wikitextToPlain(input: string): string {
   text = text.replace(/'''|''/g, "");
   text = text.replace(/<br\s*\/?>/gi, "\n");
   text = text.replace(/<[^>]+>/g, "");
+  text = text.replace(/\[\[|\]\]/g, "");
   text = text.replace(/^=+\s*(.*?)\s*=+$/gm, "$1");
   text = text.replace(/^\*+\s*/gm, "");
   text = text.replace(/^#+\s*/gm, "");

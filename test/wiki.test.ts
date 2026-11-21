@@ -58,7 +58,8 @@ describe("get_page", () => {
     expect(result.summary).toMatch(/State of Leonida/);
     expect(result.summary).toMatch(/United States/);
     expect(result.summary).toMatch(/Grand Theft Auto VI/);
-    expect(result.summary).not.toMatch(/\{\{/);
+    expect(result.summary).toMatch(/Only in Leonida/);
+    expect(result.summary).not.toMatch(/\{\{|\]\]|State of Florida|Korean/);
     expect(result.license).toMatch(/CC BY-SA/);
   });
 
